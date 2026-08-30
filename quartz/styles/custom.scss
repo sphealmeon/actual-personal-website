@@ -1,0 +1,195 @@
+@use "./base.scss";
+
+// ============================================================================
+// Custom theme — horizontal navbar instead of a wiki side rail, wider centered
+// prose, bolder type, and a stronger accent identity.
+// ============================================================================
+
+// FolderPage always appends an auto-generated "N items under this folder"
+// listing (with dates + tag pills) below real content on any /index page —
+// there's no plugin option to fully suppress it, only the count text. Our
+// index pages (projects, blog) are hand-authored with their own link lists,
+// so the auto listing is pure duplication — hide it.
+.page-listing {
+  display: none;
+}
+
+// Collapse the three-column wiki grid (sidebar / content / sidebar) into a
+// single column: the existing logo + toolbar components are re-flowed into a
+// slim sticky top navbar instead of a tall vertical rail. This is the single
+// biggest visual difference from a stock Quartz layout, and it's built purely
+// from components that already exist — no custom plugin needed.
+.page > #quartz-body {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto auto;
+  grid-template-areas:
+    "grid-sidebar-left"
+    "grid-header"
+    "grid-center"
+    "grid-footer";
+
+  & .sidebar.left {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: auto;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    gap: 1.5rem;
+    background: color-mix(in srgb, var(--light) 90%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--lightgray);
+
+    @media (max-width: 800px) {
+      padding: 1rem;
+    }
+  }
+
+  & .sidebar.right {
+    display: none;
+  }
+
+  & .page-header {
+    margin: 2.5rem 0 0 0;
+  }
+
+  & .center,
+  & footer {
+    box-sizing: border-box;
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+
+    @media (max-width: 800px) {
+      padding: 0 1rem;
+    }
+  }
+}
+
+// Site logo: bold, gradient-filled, distinct from body copy
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+
+  a {
+    background: linear-gradient(135deg, var(--secondary), var(--tertiary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+// Page/article titles: larger and tighter than the default
+.article-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+// Home page hero: push the name treatment further
+body[data-slug="index"] {
+  .article-title {
+    font-size: 3.25rem;
+  }
+
+  // Anchored to .center (not article) — .page-header, which holds the
+  // "Jeff Qiu" title itself, is a sibling of <article> inside .center, so
+  // anchoring to article alone left the glow starting below the title.
+  .center {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -2rem;
+      left: -2rem;
+      right: -2rem;
+      height: 18rem;
+      background: radial-gradient(
+        ellipse at top left,
+        color-mix(in srgb, var(--secondary) 12%, transparent),
+        transparent 70%
+      );
+      z-index: -1;
+      pointer-events: none;
+    }
+  }
+}
+
+// Internal links: a real (always-visible) underline instead of the default
+// highlighted-pill look — a hover-only reveal wasn't obvious enough as a link.
+a.internal {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-color: color-mix(in srgb, var(--secondary) 45%, transparent);
+  transition:
+    text-decoration-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    text-decoration-color: var(--secondary);
+  }
+
+  &:has(> img) {
+    text-decoration: none;
+  }
+}
+
+// Tag pills: drop the "#" prefix
+a.internal.tag-link::before {
+  content: "";
+}
+
+// Footer doubles as primary site nav now — render its links as pill buttons
+footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--lightgray);
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0 0;
+  }
+
+  li {
+    margin: 0;
+  }
+
+  ul a {
+    display: inline-block;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--lightgray);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--darkgray);
+    background: transparent;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--secondary);
+      color: var(--secondary);
+      background: var(--highlight);
+    }
+  }
+}
+
+// Give the page-transition progress bar the same accent gradient as the logo
+.navigation-progress {
+  background: linear-gradient(90deg, var(--secondary), var(--tertiary));
+  height: 3px;
+}
